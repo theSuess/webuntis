@@ -35,8 +35,7 @@ class Session
 		}
 		catch (JSONException ex)
 		{
-			//TODO: Throw Exception
-			writef("Login Error: %s\n",response["error"]["message"].str);
+			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
 	public void logout()
@@ -46,12 +45,11 @@ class Session
 		auto response = sendRequest(req.toJSON());
 		try
 		{
-			cast(void) response["result"].isNull();	
+			cast(void) response["result"].isNull();
 		}
 		catch (JSONException ex)
 		{
-			//TODO: Throw Exception
-			writef("Logout Error: %s\n",response["error"]["message"].str);
+			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
 	private JSONValue sendRequest(JSONValue data)
