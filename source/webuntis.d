@@ -52,6 +52,32 @@ class Session
 			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
+
+	public SchoolClass[] getClasses()
+	{
+		auto params = "{}";
+		auto req = Request("2","getKlassen",params);
+		auto response = sendRequest(req.toJSON());
+		SchoolClass[] classes;
+		try
+		{
+			foreach(class_;response["result"].array)
+			{
+				auto newClass = SchoolClass(
+						to!int(class_["id"].integer),
+						class_["name"].str,
+						class_["longName"].str,
+						class_["active"].type == JSON_TYPE.TRUE
+						);
+				classes ~= newClass;
+			}
+		}
+		catch (JSONException ex)
+		{
+			throw new Exception(format("Classes Error: %s",response["error"]["message"].str));
+		}
+		return classes;
+	}
 	private JSONValue sendRequest(JSONValue data)
 	{
 		string reqbody = data.toString();
@@ -103,4 +129,12 @@ struct SessionConfiguration
 	string server;
 	string school;
 	string client;
+}
+
+struct SchoolClass
+{
+	int id;
+	string name;
+	string longName;
+	bool active;
 }
