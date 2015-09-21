@@ -5,5 +5,6 @@
 	"authors": ["thesuess"],
 	"targetType":"library",
 	"dependencies": {
-	}
+	},
+	"libs":["curl"]
 }
