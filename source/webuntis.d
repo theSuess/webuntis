@@ -55,7 +55,7 @@ class Session
 	private JSONValue sendRequest(JSONValue data)
 	{
 		string reqbody = data.toString();
-		auto client = HTTP(url);
+		auto client = HTTP();
 		client.addRequestHeader("Content-Type","application/json");
 		client.postData = reqbody;
 
@@ -65,19 +65,7 @@ class Session
 		}
 
 		// Response handling setup
-		string response;
-		client.onReceive = (ubyte[] data) { response = to!string(cast(char[]) data); return data.length; };
-
-		// Starting the actual request
-		try
-		{
-			client.perform();
-		}
-		catch (CurlException ex)
-		{
-			throw ex;
-		}
-
+		string response = post(url,reqbody,client).dup;
 		// Parsing and returning the JSON
 		return parseJSON(response);
 	}
