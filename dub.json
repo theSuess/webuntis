@@ -3,7 +3,7 @@
 	"description": "Wrapper for the Webuntis API",
 	"copyright": "Copyright © 2015, thesuess",
 	"authors": ["thesuess"],
-	"targetType":"library"
+	"targetType":"library",
 	"dependencies": {
 	}
 }
