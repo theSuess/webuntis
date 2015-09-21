@@ -1,4 +1,4 @@
-module libuntis;
+module webuntis;
 
 import std.stdio;
 
