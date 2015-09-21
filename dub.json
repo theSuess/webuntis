@@ -4,7 +4,6 @@
 	"copyright": "Copyright © 2015, thesuess",
 	"authors": ["thesuess"],
 	"targetType":"library",
-	"dependencies": {
-	},
+	"license":"MIT",
 	"libs":["curl"]
 }
