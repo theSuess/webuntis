@@ -12,11 +12,11 @@ import std.stdio;
 void main()
 {
 	SessionConfiguration sconf = SessionConfiguration(
-	    "username",
-			"password",
-			"server", // part before .webuntis.com Examples: melpomene or poly
-			"school",
-			"User Agent");
+		"username",
+		"password",
+		"server", // part before .webuntis.com Examples: melpomene or poly
+		"school",
+		"User Agent");
 	Session s = new Session(sconf);
 	s.login();
 	auto classes = s.getClasses();
