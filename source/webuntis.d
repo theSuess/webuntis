@@ -37,7 +37,7 @@ class Session
 		}
 		catch (JSONException ex)
 		{
-			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
+			throw new WebUntisException(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
 	public void logout()
@@ -51,7 +51,7 @@ class Session
 		}
 		catch (JSONException ex)
 		{
-			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
+			throw new WebUntisException(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
 	unittest
@@ -68,7 +68,7 @@ class Session
 
 		sconf.username = "dummy";
 		s = new Session(sconf);
-		assertThrown!Exception(s.login());
+		assertThrown!WebUntisException(s.login());
 	}
 
 	public SchoolClass[] getClasses()
@@ -169,4 +169,15 @@ struct SchoolClass
 	string name;
 	string longName;
 	bool active;
+}
+
+/**
+	Exception thrown on Webuntis Errors
+*/
+class WebUntisException : Exception
+{
+	this(string msg)
+	{
+		super(msg);
+	}
 }
