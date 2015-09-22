@@ -112,6 +112,54 @@ class Session
 		assert(s.getClasses().length > 0);
 		s.logout();
 	}
+
+	public Teacher[] getTeachers()
+	{
+		auto params = "{}";
+		auto req = Request("3","getTeachers",params);
+		auto response = sendRequest(req.toJSON());
+		Teacher[] teachers;
+		try
+		{
+			foreach(teacher;response["result"].array)
+			{
+				//ID,Name,foreName,longName,active
+				auto newTeacher = Teacher(
+						to!int(teacher["id"].integer),
+						teacher["name"].str,
+						teacher["foreName"].str,
+						teacher["longName"].str,
+						teacher["active"].type == JSON_TYPE.TRUE
+						);
+				teachers ~= newTeacher;
+			}
+		}
+		catch (JSONException ex)
+		{
+			throw new WebUntisException(format("Teachers Error: %s",response["error"]["message"].str));
+		}
+		return teachers;
+	}
+	unittest
+	{
+		SessionConfiguration sconf = SessionConfiguration(
+			environment["wuuser"],
+			environment["wupassword"],
+			environment["wuserver"],
+			environment["wuschool"],
+			"WebUntis API dlang wrapper");
+		Session s = new Session(sconf);
+
+		// Pre-Login getTeachers
+		assertThrown!WebUntisException(s.getTeachers());
+		s.login();
+		auto teachers = s.getTeachers();
+		assert(teachers.length > 0);
+		writef("Found %s teachers \n",teachers.length);
+		writef("For Example: %s \n",teachers[$/2].longName);
+		s.logout();
+	}
+
 	private JSONValue sendRequest(JSONValue data)
 	{
 		string reqbody = data.toString();
@@ -164,6 +212,17 @@ struct SessionConfiguration
 	string server;
 	string school;
 	string client;
+}
+
+// Objects representing the school entities
+
+struct Teacher
+{
+	int id;
+	string name;
+	string foreName;
+	string longName; // Used as lastname
+	bool active;
 }
 
 struct SchoolClass
