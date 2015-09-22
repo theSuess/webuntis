@@ -136,6 +136,7 @@ class Session
 		}
 		return subjects;
 	}
+
 	public Room[] getRooms()
 	{
 		auto params = "{}";
