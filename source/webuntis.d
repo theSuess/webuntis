@@ -8,6 +8,7 @@ import std.format;
 import std.conv;
 import std.string;
 import std.process;
+import std.datetime;
 
 pragma(lib,"curl");
 
@@ -29,7 +30,7 @@ class Session
 	{
 		auto params = format("{\"user\":\"%s\",\"password\":\"%s\",\"client\":\"%s\"}",
 				username,password,client);
-		auto req = Request("1","authenticate",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"authenticate",params);
 		auto response = sendRequest(req.toJSON());
 		try
 		{
@@ -43,7 +44,7 @@ class Session
 	public void logout()
 	{
 		auto params = "{}";
-		auto req = Request("2","logout",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"logout",params);
 		auto response = sendRequest(req.toJSON());
 		try
 		{
@@ -58,7 +59,7 @@ class Session
 	public SchoolClass[] getClasses()
 	{
 		auto params = "{}";
-		auto req = Request("2","getKlassen",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getKlassen",params);
 		auto response = sendRequest(req.toJSON());
 		SchoolClass[] classes;
 		try
@@ -84,7 +85,7 @@ class Session
 	public Teacher[] getTeachers()
 	{
 		auto params = "{}";
-		auto req = Request("3","getTeachers",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getTeachers",params);
 		auto response = sendRequest(req.toJSON());
 		Teacher[] teachers;
 		try
@@ -112,7 +113,7 @@ class Session
 	public Subject[] getSubjects()
 	{
 		auto params = "{}";
-		auto req = Request("4","getSubjects",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getSubjects",params);
 		auto response = sendRequest(req.toJSON());
 		Subject[] subjects;
 		try
@@ -140,7 +141,7 @@ class Session
 	public Room[] getRooms()
 	{
 		auto params = "{}";
-		auto req = Request("5","getRooms",params);
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getRooms",params);
 		auto response = sendRequest(req.toJSON());
 		Room[] rooms;
 		try
