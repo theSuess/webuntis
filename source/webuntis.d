@@ -96,6 +96,19 @@ class Session
 		}
 		return classes;
 	}
+	unittest
+	{
+		SessionConfiguration sconf = SessionConfiguration(
+			environment["wuuser"],
+			environment["wupassword"],
+			environment["wuserver"],
+			environment["wuschool"],
+			"WebUntis API dlang wrapper");
+		Session s = new Session(sconf);
+		s.login();
+		assert(s.getClasses().length > 0);
+		s.logout();
+	}
 	private JSONValue sendRequest(JSONValue data)
 	{
 		string reqbody = data.toString();
