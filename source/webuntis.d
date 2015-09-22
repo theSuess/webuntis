@@ -54,25 +54,6 @@ class Session
 			throw new WebUntisException(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
-	unittest
-	{
-		SessionConfiguration sconf = SessionConfiguration(
-			environment["wuuser"],
-			environment["wupassword"],
-			environment["wuserver"],
-			environment["wuschool"],
-			"WebUntis API dlang wrapper");
-		Session s = new Session(sconf);
-		s.login();
-		s.logout();
-
-		// Logging out when allready logged out
-		assertThrown!WebUntisException(s.logout());
-
-		sconf.username = "dummy";
-		s = new Session(sconf);
-		assertThrown!WebUntisException(s.login());
-	}
 
 	public SchoolClass[] getClasses()
 	{
@@ -95,22 +76,9 @@ class Session
 		}
 		catch (JSONException ex)
 		{
-			throw new Exception(format("Classes Error: %s",response["error"]["message"].str));
+			throw new WebUntisException(format("Classes Error: %s",response["error"]["message"].str));
 		}
 		return classes;
-	}
-	unittest
-	{
-		SessionConfiguration sconf = SessionConfiguration(
-			environment["wuuser"],
-			environment["wupassword"],
-			environment["wuserver"],
-			environment["wuschool"],
-			"WebUntis API dlang wrapper");
-		Session s = new Session(sconf);
-		s.login();
-		assert(s.getClasses().length > 0);
-		s.logout();
 	}
 
 	public Teacher[] getTeachers()
@@ -139,25 +107,6 @@ class Session
 			throw new WebUntisException(format("Teachers Error: %s",response["error"]["message"].str));
 		}
 		return teachers;
-	}
-	unittest
-	{
-		SessionConfiguration sconf = SessionConfiguration(
-			environment["wuuser"],
-			environment["wupassword"],
-			environment["wuserver"],
-			environment["wuschool"],
-			"WebUntis API dlang wrapper");
-		Session s = new Session(sconf);
-
-		// Pre-Login getTeachers
-		assertThrown!WebUntisException(s.getTeachers());
-		s.login();
-		auto teachers = s.getTeachers();
-		assert(teachers.length > 0);
-		writef("Found %s teachers \n",teachers.length);
-		writef("For Example: %s \n",teachers[$/2].longName);
-		s.logout();
 	}
 
 	private JSONValue sendRequest(JSONValue data)
@@ -242,4 +191,66 @@ class WebUntisException : Exception
 	{
 		super(msg);
 	}
+}
+
+// All Testing happens HERE
+
+unittest
+{
+	SessionConfiguration sconf = SessionConfiguration(
+		environment["wuuser"],
+		"wrongpassword",
+		environment["wuserver"],
+		environment["wuschool"],
+		"WebUntis API dlang wrapper");
+
+	Session s = new Session(sconf);
+
+	writeln("Begin of Tests");
+	writeln("---------------------------------------");
+
+	writeln("Testing method access before login");
+	assertThrown!WebUntisException(s.getClasses());
+	assertThrown!WebUntisException(s.getTeachers());
+	assertThrown!WebUntisException(s.logout());
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	
+	writeln("Testing Login with wrong password");
+	assertThrown!WebUntisException(s.login());
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	// Setting the real password
+	sconf.password = environment["wupassword"];
+	s = new Session(sconf);
+
+	writeln("Testing Login with right password");
+	assertNotThrown!WebUntisException(s.login());
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	writeln("Testing Teachers");
+	auto teachers = s.getTeachers();
+	assert(teachers.length > 0);
+	writef("Found %s teachers\n",teachers.length);
+	writef("For Example: %s\n",teachers[$/2].longName);
+
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	writeln("Testing Classes");
+	auto classes = s.getClasses();
+	assert(classes.length > 0);
+	writef("Found %s classes\n",classes.length);
+	writef("For Example %s\n",classes[$/2].name);
+	writeln("OK");
+
+	writeln("---------------------------------------");
+	s.logout();
 }
