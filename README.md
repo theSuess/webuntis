@@ -26,3 +26,12 @@ void main()
 	}
 }
 ```
+
+## Testing
+To test this library on your system you need to set following environment variables
+```
+wuuser 		= webuntis user
+wupassword 	= webuntis password
+wuserver 	= webuntis server
+wuschool 	= webuntis school
+```
