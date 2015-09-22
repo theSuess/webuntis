@@ -109,6 +109,33 @@ class Session
 		return teachers;
 	}
 
+	public Subject[] getSubjects()
+	{
+		auto params = "{}";
+		auto req = Request("4","getSubjects",params);
+		auto response = sendRequest(req.toJSON());
+		Subject[] subjects;
+		try
+		{
+			foreach(subject;response["result"].array)
+			{
+				//ID,Name,longName,alternateName,active
+				auto newSubject = Subject(
+						to!int(subject["id"].integer),
+						subject["name"].str,
+						subject["longName"].str,
+						subject["alternateName"].str,
+						subject["active"].type == JSON_TYPE.TRUE
+						);
+				subjects ~= newSubject;
+			}
+		}
+		catch (JSONException ex)
+		{
+			throw new WebUntisException(format("Subjects Error: %s",response["error"]["message"].str));
+		}
+		return subjects;
+	}
 
 	private JSONValue sendRequest(JSONValue data)
 	{
@@ -172,6 +199,15 @@ struct Teacher
 	string name;
 	string foreName;
 	string longName; // Used as lastname
+	bool active;
+}
+
+struct Subject
+{
+	int id;
+	string name;
+	string longName;
+	string alternateName;
 	bool active;
 }
 
@@ -239,6 +275,16 @@ unittest
 	assert(teachers.length > 0);
 	writef("Found %s teachers\n",teachers.length);
 	writef("For Example: %s\n",teachers[$/2].longName);
+
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	writeln("Testing Subjects");
+	auto subjects = s.getSubjects();
+	assert(subjects.length > 0);
+	writef("Found %s subjects\n",subjects.length);
+	writef("For Example: %s\n",subjects[$/2].longName);
 
 	writeln("OK");
 
