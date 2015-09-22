@@ -109,6 +109,7 @@ class Session
 		return teachers;
 	}
 
+
 	private JSONValue sendRequest(JSONValue data)
 	{
 		string reqbody = data.toString();
@@ -217,7 +218,6 @@ unittest
 
 	writeln("---------------------------------------");
 
-	
 	writeln("Testing Login with wrong password");
 	assertThrown!WebUntisException(s.login());
 	writeln("OK");
