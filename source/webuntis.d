@@ -66,6 +66,9 @@ class Session
 		s.login();
 		s.logout();
 
+		// Logging out when allready logged out
+		assertThrown!WebUntisException(s.logout());
+
 		sconf.username = "dummy";
 		s = new Session(sconf);
 		assertThrown!WebUntisException(s.login());
