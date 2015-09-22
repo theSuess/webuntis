@@ -136,6 +136,32 @@ class Session
 		}
 		return subjects;
 	}
+	public Room[] getRooms()
+	{
+		auto params = "{}";
+		auto req = Request("5","getRooms",params);
+		auto response = sendRequest(req.toJSON());
+		Room[] rooms;
+		try
+		{
+			foreach(room;response["result"].array)
+			{
+				//ID,Name,longName,active
+				auto newRoom = Room(
+						to!int(room["id"].integer),
+						room["name"].str,
+						room["longName"].str,
+						room["active"].type == JSON_TYPE.TRUE
+						);
+				rooms ~= newRoom;
+			}
+		}
+		catch (JSONException ex)
+		{
+			throw new WebUntisException(format("Subjects Error: %s",response["error"]["message"].str));
+		}
+		return rooms;
+	}
 
 	private JSONValue sendRequest(JSONValue data)
 	{
@@ -219,6 +245,14 @@ struct SchoolClass
 	bool active;
 }
 
+struct Room
+{
+	int id;
+	string name;
+	string longName;
+	bool active;
+}
+
 /**
 	Exception thrown on Webuntis Errors
 */
@@ -285,6 +319,16 @@ unittest
 	assert(subjects.length > 0);
 	writef("Found %s subjects\n",subjects.length);
 	writef("For Example: %s\n",subjects[$/2].longName);
+
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	writeln("Testing Rooms");
+	auto rooms = s.getRooms();
+	assert(subjects.length > 0);
+	writef("Found %s Rooms\n",rooms.length);
+	writef("For Example: %s\n",rooms[$/2].longName);
 
 	writeln("OK");
 
