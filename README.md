@@ -1,4 +1,6 @@
-# webuntis
+# webuntis 
+[![Build Status](https://travis-ci.org/theSuess/webuntis.svg?branch=master)](https://travis-ci.org/theSuess/webuntis)
+
 Webuntis API-Wrapper for dlang
 
 ## Usage
