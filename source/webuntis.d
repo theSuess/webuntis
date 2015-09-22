@@ -1,11 +1,13 @@
 module webuntis;
 
 import std.stdio;
+import std.exception;
 import std.net.curl;
 import std.json;
 import std.format;
 import std.conv;
 import std.string;
+import std.process;
 
 pragma(lib,"curl");
 
@@ -52,6 +54,22 @@ class Session
 			throw new Exception(format("Login Error: %s",response["error"]["message"].str));
 		}
 	}
+	unittest
+	{
+		SessionConfiguration sconf = SessionConfiguration(
+			environment["wuuser"],
+			environment["wupassword"],
+			environment["wuserver"],
+			environment["wuschool"],
+			"WebUntis API dlang wrapper");
+		Session s = new Session(sconf);
+		s.login();
+		s.logout();
+
+		sconf.username = "dummy";
+		s = new Session(sconf);
+		assertThrown!Exception(s.login());
+	}
 
 	public SchoolClass[] getClasses()
 	{
@@ -96,6 +114,7 @@ class Session
 		return parseJSON(response);
 	}
 }
+
 
 struct Request
 {
