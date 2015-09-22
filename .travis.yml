@@ -1,4 +1,1 @@
 language: d
-
-d:
-    - dmd-2.068.0
