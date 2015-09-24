@@ -9,6 +9,7 @@ import std.conv;
 import std.string;
 import std.process;
 import std.datetime;
+import objects;
 
 pragma(lib,"curl");
 
@@ -219,42 +220,6 @@ struct SessionConfiguration
 	string client;
 }
 
-// Objects representing the school entities
-
-struct Teacher
-{
-	int id;
-	string name;
-	string foreName;
-	string longName; // Used as lastname
-	bool active;
-}
-
-struct Subject
-{
-	int id;
-	string name;
-	string longName;
-	string alternateName;
-	bool active;
-}
-
-struct SchoolClass
-{
-	int id;
-	string name;
-	string longName;
-	bool active;
-}
-
-struct Room
-{
-	int id;
-	string name;
-	string longName;
-	bool active;
-}
-
 /**
 	Exception thrown on Webuntis Errors
 */
@@ -267,7 +232,6 @@ class WebUntisException : Exception
 }
 
 // All Testing happens HERE
-
 unittest
 {
 	SessionConfiguration sconf = SessionConfiguration(
