@@ -1,6 +1,8 @@
 module webuntis;
 
 import std.stdio;
+import std.array;
+import std.algorithm;
 import std.exception;
 import std.net.curl;
 import std.json;
@@ -9,7 +11,9 @@ import std.conv;
 import std.string;
 import std.process;
 import std.datetime;
+
 import objects;
+import timetable;
 
 pragma(lib,"curl");
 
@@ -20,6 +24,10 @@ class Session
 	private string sessionID;
 	private string url;
 	private string client;
+
+	private Teacher[] teacherCache;
+	private Subject[] subjectCache;
+
 	this(SessionConfiguration conf)
 	{
 		this.username = conf.username;
@@ -81,6 +89,51 @@ class Session
 			throw new WebUntisException(format("Classes Error: %s",response["error"]["message"].str));
 		}
 		return classes;
+	}
+
+	public Timetable getTimetable()
+	{
+		teacherCache = getTeachers();
+		subjectCache = getSubjects();
+		int startDate = 20150925;
+		int endDate = 20150926;
+		auto params = "{\"id\":37,
+			\"type\":1,
+			\"startDate\":\"20150925\",
+			\"endDate\":\"20150926\"}";
+
+		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getTimetable",params);
+		auto response = sendRequest(req.toJSON());
+		Timetable t;
+		ClassUnit[] units;
+		try
+		{
+			t = Timetable();	
+			foreach(rawUnit;response["result"].array)
+			{
+				auto unit = ClassUnit(
+						subjectCache.filter!(x => x.id == rawUnit["su"][0]["id"].integer).front,
+						teacherCache.filter!(x => x.id == rawUnit["te"][0]["id"].integer).front,
+						to!int(rawUnit["startTime"].integer),
+						to!int(rawUnit["date"].integer)
+						);
+				units ~= unit;
+			}
+		}
+		catch (Exception ex)
+		{
+			throw new WebUntisException(format("Teachers Error: %s",response["error"]["message"].str));
+		}
+
+		bool startTimeComp(ClassUnit x, ClassUnit y) @safe pure nothrow { return x.startTime > y.startTime; }
+		for (int date = startDate; date < endDate; date++)
+		{
+			auto dayunits = array(units.filter!(x => x.date == date));
+			SchoolDay day;
+			day.units ~= array(sort!startTimeComp(dayunits));
+			t.days ~= day;
+		}
+		return t;
 	}
 
 	public Teacher[] getTeachers()
@@ -305,6 +358,12 @@ unittest
 	assert(classes.length > 0);
 	writef("Found %s classes\n",classes.length);
 	writef("For Example %s\n",classes[$/2].name);
+	writeln("OK");
+
+	writeln("---------------------------------------");
+
+	writeln("Testing Timetable");
+	auto table = s.getTimetable();
 	writeln("OK");
 
 	writeln("---------------------------------------");

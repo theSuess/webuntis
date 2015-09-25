@@ -1,5 +1,4 @@
 // Objects representing the school entities
-
 struct Teacher
 {
 	int id;
