@@ -91,16 +91,14 @@ class Session
 		return classes;
 	}
 
-	public Timetable getTimetable()
+	public Timetable getTimetable(int startDate,int endDate,int class_)
 	{
 		teacherCache = getTeachers();
 		subjectCache = getSubjects();
-		int startDate = 20150925;
-		int endDate = 20150926;
-		auto params = "{\"id\":37,
+		auto params = format("{\"id\":%s,
 			\"type\":1,
-			\"startDate\":\"20150925\",
-			\"endDate\":\"20150926\"}";
+			\"startDate\":\"%s\",
+			\"endDate\":\"%s\"}",class_,startDate,endDate);
 
 		auto req = Request(to!string(Clock.currTime().toUnixTime()),"getTimetable",params);
 		auto response = sendRequest(req.toJSON());
@@ -120,9 +118,9 @@ class Session
 				units ~= unit;
 			}
 		}
-		catch (Exception ex)
+		catch (JSONException ex)
 		{
-			throw new WebUntisException(format("Teachers Error: %s",response["error"]["message"].str));
+			throw new WebUntisException(format("Timetable Error: %s",response["error"]["message"].str));
 		}
 
 		bool startTimeComp(ClassUnit x, ClassUnit y) @safe pure nothrow { return x.startTime > y.startTime; }
@@ -130,7 +128,7 @@ class Session
 		{
 			auto dayunits = array(units.filter!(x => x.date == date));
 			SchoolDay day;
-			day.units ~= array(sort!startTimeComp(dayunits));
+			day.units ~= dayunits;
 			t.days ~= day;
 		}
 		return t;
@@ -363,7 +361,7 @@ unittest
 	writeln("---------------------------------------");
 
 	writeln("Testing Timetable");
-	auto table = s.getTimetable();
+	auto table = s.getTimetable(20150925,20150926,37);
 	writeln("OK");
 
 	writeln("---------------------------------------");
